@@ -6,6 +6,7 @@ python = ">=3.12,<3.13"
 tensorflow = "~2.16"
 tensorflow-io-gcs-filesystem = "~0.37.1"
 tensorflow-datasets = "^4.9.6"
+matplotlib = "^3.9.2"
 
 
 [build-system]
