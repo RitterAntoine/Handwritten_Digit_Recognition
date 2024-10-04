@@ -2,6 +2,11 @@ import tensorflow as tf
 from tensorflow.keras import datasets, layers, models
 import matplotlib.pyplot as plt
 
+# Define important variables
+IMG_HEIGHT, IMG_WIDTH, IMG_CHANNELS = 28, 28, 1  # Image dimensions and channels
+NUM_CLASSES = 10  # Number of classes in the dataset
+EPOCHS = 10  # Number of epochs for training
+
 # Load the MNIST dataset
 (train_images, train_labels), (test_images, test_labels) = datasets.mnist.load_data()
 
@@ -10,13 +15,14 @@ train_images = train_images / 255.0
 test_images = test_images / 255.0
 
 # Reshape data to include a single color channel
-train_images = train_images.reshape((train_images.shape[0], 28, 28, 1))
-test_images = test_images.reshape((test_images.shape[0], 28, 28, 1))
+train_images = train_images.reshape((train_images.shape[0], IMG_HEIGHT, IMG_WIDTH, IMG_CHANNELS))
+test_images = test_images.reshape((test_images.shape[0], IMG_HEIGHT, IMG_WIDTH, IMG_CHANNELS))
 
+# Create the sequential model
 model = models.Sequential()
 
 # Add a Convolutional layer with 32 filters, a 3x3 kernel, and ReLU activation
-model.add(layers.Conv2D(32, (3, 3), activation='relu', input_shape=(28, 28, 1)))
+model.add(layers.Conv2D(32, (3, 3), activation='relu', input_shape=(IMG_HEIGHT, IMG_WIDTH, IMG_CHANNELS)))
 model.add(layers.MaxPooling2D((2, 2)))  # Add a Max Pooling layer
 
 # Add another convolutional layer and pooling layer
@@ -28,15 +34,18 @@ model.add(layers.Flatten())
 model.add(layers.Dense(64, activation='relu'))
 
 # Output layer with 10 units for the 10 digit classes, with softmax activation
-model.add(layers.Dense(10, activation='softmax'))
+model.add(layers.Dense(NUM_CLASSES, activation='softmax'))
 
+# Compile the model with the Adam optimizer and sparse categorical crossentropy loss
 model.compile(optimizer='adam',
               loss='sparse_categorical_crossentropy',
               metrics=['accuracy'])
 
-history = model.fit(train_images, train_labels, epochs=10, 
+# Train the model
+history = model.fit(train_images, train_labels, epochs=EPOCHS, 
                     validation_data=(test_images, test_labels))
 
+# Evaluate the model on the test data
 test_loss, test_acc = model.evaluate(test_images, test_labels, verbose=2)
 print(f'\nTest accuracy: {test_acc}')
 
