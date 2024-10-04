@@ -25,8 +25,8 @@ The project uses the MNIST dataset, which consists of 28x28 grayscale images of 
 
 1. Clone the repository:
     ```bash
-    git clone <https://github.com/RitterAntoine/Handwritten_Digit_Recognition.git>
-    cd <Handwritten_Digit_Recognition>
+    git clone https://github.com/RitterAntoine/Handwritten_Digit_Recognition.git
+    cd Handwritten_Digit_Recognition
     ```
 
 2. Install the required dependencies:
