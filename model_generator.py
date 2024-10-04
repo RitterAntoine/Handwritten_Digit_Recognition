@@ -1,13 +1,13 @@
 # === Code for training and saving the model ===
 import os
+os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
+os.environ['CUDA_VISIBLE_DEVICES'] = '-1'
 import warnings
 from keras.datasets import mnist
 from keras import layers, models
 import tensorflow as tf
 
 # Suppress TensorFlow and CUDA messages
-os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
-os.environ['CUDA_VISIBLE_DEVICES'] = '-1'
 warnings.filterwarnings("ignore", category=UserWarning, module='keras')
 
 # Initialize variables
