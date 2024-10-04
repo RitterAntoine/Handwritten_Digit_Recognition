@@ -77,5 +77,5 @@ The project requires the following Python libraries:
 
 You can install all dependencies by running:
 ```bash
-pip install -r requirements.txt
+poetry install
 ```
