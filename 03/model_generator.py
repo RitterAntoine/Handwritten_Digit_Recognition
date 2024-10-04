@@ -13,7 +13,7 @@ warnings.filterwarnings("ignore", category=UserWarning, module='keras')
 # Initialize variables
 num_classes = 10
 input_shape = (28, 28, 1)
-epochs = 10
+epochs = 20
 batch_size = 64
 
 # Load the MNIST dataset
