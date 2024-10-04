@@ -705,13 +705,13 @@ type = ["pytest-mypy"]
 
 [[package]]
 name = "keras"
-version = "3.5.0"
+version = "3.6.0"
 description = "Multi-backend Keras."
 optional = false
 python-versions = ">=3.9"
 files = [
-    {file = "keras-3.5.0-py3-none-any.whl", hash = "sha256:d37a3c623935713473ceb25241b52bce9d1e0ff5b36e5d0f6f47ed55f8500c9a"},
-    {file = "keras-3.5.0.tar.gz", hash = "sha256:53ae4f9472ec9d9c6941c82a3fda86969724ace3b7630a94ba0a1f17ba1065c3"},
+    {file = "keras-3.6.0-py3-none-any.whl", hash = "sha256:49585e4577f6e86bd890d96dfbcb1890f5bab5967ef831c07fd63f9d86e4bfe9"},
+    {file = "keras-3.6.0.tar.gz", hash = "sha256:405727525a3522ed8f9ec0b46e0667e4c65fcf714a067322c16a00d902ded41d"},
 ]
 
 [package.dependencies]
@@ -2020,4 +2020,4 @@ type = ["pytest-mypy"]
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.12,<3.13"
-content-hash = "bed49ab8d06a045d9cbc5b502236c5a78cfa080fa319da341a515b90534a6474"
+content-hash = "bb4f36953bfe90e7aa7b371a6753efbace5a155151188aa9018d545900299109"
