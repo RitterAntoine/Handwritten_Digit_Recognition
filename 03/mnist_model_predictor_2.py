@@ -1,13 +1,13 @@
 import os
+os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
+os.environ['CUDA_VISIBLE_DEVICES'] = '-1'
 import warnings
 import numpy as np
 from keras import models
 from PIL import Image, ImageDraw
 import tkinter as tk
-
-# Suppress TensorFlow and CUDA messages
-os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
-os.environ['CUDA_VISIBLE_DEVICES'] = '-1'
+import absl.logging
+absl.logging.set_verbosity(absl.logging.ERROR)
 warnings.filterwarnings("ignore", category=UserWarning, module='keras')
 
 # Load the trained model
