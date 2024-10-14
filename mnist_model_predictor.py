@@ -61,7 +61,7 @@ class DigitRecognizerApp:
         self.clear_button.pack(pady=10)
     
     def preprocess_image(self, image):
-        """Converts the drawn image to a 28x28 grayscale image and normalizes it."""
+        # Converts the drawn image to a 28x28 grayscale image and normalizes it.
         image = image.resize((28, 28)).convert('L')  # Resize and convert to grayscale
         img_array = np.array(image)  # Convert to numpy array
         img_array = img_array / 255.0  # Normalize to [0, 1]
@@ -69,13 +69,13 @@ class DigitRecognizerApp:
         return img_array
     
     def predict_digit(self, image):
-        """Predicts the digit from the processed image."""
+        # Predicts the digit from the processed image.
         processed_image = self.preprocess_image(image)
         prediction = model.predict(processed_image)
         return prediction
     
     def paint(self, event):
-        """Draws on the canvas."""
+        # Draws on the canvas.
         x1, y1 = (event.x - 10), (event.y - 10)
         x2, y2 = (event.x + 10), (event.y + 10)
         self.canvas.create_oval(x1, y1, x2, y2, fill='black', width=20)
@@ -86,19 +86,19 @@ class DigitRecognizerApp:
         self.lastx, self.lasty = event.x, event.y
     
     def reset(self, event):
-        """Resets the lastx and lasty variables and makes a prediction."""
+        # Resets the lastx and lasty variables and makes a prediction.
         self.lastx, self.lasty = None, None
         self.handle_predict()  # Make a prediction when the user finishes drawing
     
     def clear_canvas(self):
-        """Clears the canvas."""
+        # Clears the canvas.
         self.canvas.delete('all')
         self.draw.rectangle((0, 0, CANVAS_WIDTH, CANVAS_HEIGHT), fill='white')
         self.result_label.config(text='Predicted Digit: None')  # Reset the prediction label
         self.probabilities_label.config(text='Probabilities: None')  # Reset the probabilities label
     
     def handle_predict(self):
-        """Handles the prediction and displays the result."""
+        # Handles the prediction and displays the result.
         prediction = self.predict_digit(self.image)
         predicted_digit = np.argmax(prediction)
         self.result_label.config(text=f'Predicted Digit: {predicted_digit}')
