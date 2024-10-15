@@ -382,7 +382,7 @@ fsspec = {version = "*", optional = true, markers = "extra == \"epath\""}
 importlib_resources = {version = "*", optional = true, markers = "extra == \"epath\""}
 numpy = {version = "*", optional = true, markers = "extra == \"enp\""}
 tqdm = {version = "*", optional = true, markers = "extra == \"etqdm\""}
-typing_extensions = {version = "*", optional = true, markers = "extra == \"epath\""}
+typing_extensions = {version = "*", optional = true, markers = "extra == \"epy\""}
 zipp = {version = "*", optional = true, markers = "extra == \"epath\""}
 
 [package.extras]
@@ -1897,6 +1897,20 @@ slack = ["slack-sdk"]
 telegram = ["requests"]
 
 [[package]]
+name = "ttkbootstrap"
+version = "1.10.1"
+description = "A supercharged theme extension for tkinter that enables on-demand modern flat style themes inspired by Bootstrap."
+optional = false
+python-versions = ">=3.7"
+files = [
+    {file = "ttkbootstrap-1.10.1-py3-none-any.whl", hash = "sha256:c6a10ee5ea64051a0f8b75c20ef8e5f2417c62b4d0858c831683d4f2135aa573"},
+    {file = "ttkbootstrap-1.10.1.tar.gz", hash = "sha256:53925525c4104f9e345627500dced2d0392ad74324b2a81467aaee3ffbe1a474"},
+]
+
+[package.dependencies]
+pillow = ">=8.2.0"
+
+[[package]]
 name = "typing-extensions"
 version = "4.12.2"
 description = "Backported and Experimental Type Hints for Python 3.8+"
@@ -2056,4 +2070,4 @@ type = ["pytest-mypy"]
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.12,<3.13"
-content-hash = "bb4f36953bfe90e7aa7b371a6753efbace5a155151188aa9018d545900299109"
+content-hash = "87d6cc7f8d3190e7df73fd003a321ff6dbd0b6b1162a1a329d2305b36662d0ae"

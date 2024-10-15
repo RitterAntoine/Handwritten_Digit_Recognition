@@ -9,6 +9,7 @@ tensorflow-datasets = "^4.9.6"
 matplotlib = "^3.9.2"
 pydot = "^3.0.2"
 keras = "^3.6.0"
+ttkbootstrap = "^1.10.1"
 
 
 [build-system]
