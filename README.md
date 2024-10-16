@@ -1,3 +1,5 @@
+![Handwritten Digit Recognition](https://github.com/user-attachments/assets/63f3afdd-5909-425f-ab37-5db4df777e09)
+
 # Handwritten Digit Recognition with CNN
 
 This project demonstrates how to build and train a Convolutional Neural Network (CNN) model to recognize handwritten digits using the MNIST dataset. It features both the training of a CNN model and an interactive graphical user interface (GUI) for real-time digit recognition.
@@ -15,8 +17,6 @@ This project demonstrates how to build and train a Convolutional Neural Network 
 - [Contributing](#contributing)
 
 ## Overview
-
-![Handwritten Digit Recognition](https://github.com/user-attachments/assets/63f3afdd-5909-425f-ab37-5db4df777e09)
 
 This project uses the [MNIST dataset](http://yann.lecun.com/exdb/mnist/), which contains 28x28 grayscale images representing handwritten digits (0-9). A Convolutional Neural Network (CNN) is built and trained to classify these digits with high accuracy. Once trained, the model is used in a graphical user interface (GUI), allowing users to draw digits and get real-time predictions.
 
