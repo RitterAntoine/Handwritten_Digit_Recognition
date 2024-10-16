@@ -1,4 +1,4 @@
-![Handwritten Digit Recognition](https://github.com/user-attachments/assets/2bd3e098-033e-441f-bac4-c862a87e2858)
+![Handwritten Digit Recognition](https://github.com/RitterAntoine/Handwritten_Digit_Recognition/blob/main/assets/pictures/8_handwrited.png)
 
 # Handwritten Digit Recognition with CNN
 
