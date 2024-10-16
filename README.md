@@ -1,4 +1,8 @@
-![Handwritten Digit Recognition](https://github.com/RitterAntoine/Handwritten_Digit_Recognition/blob/main/assets/pictures/8_handwrited.png)
+![Handwritten Digit](https://raw.githubusercontent.com/RitterAntoine/Handwritten_Digit_Recognition/main/assets/pictures/8_handwrited.png)
+
+<meta property="og:image" content="https://github.com/RitterAntoine/Handwritten_Digit_Recognition/blob/main/assets/pictures/8_handwrited.png">
+<meta property="og:title" content="Handwritten Digit Recognition with CNN">
+<meta property="og:description" content="This project demonstrates how to build and train a Convolutional Neural Network (CNN) model to recognize handwritten digits using the MNIST dataset. It features both the training of a CNN model and an interactive graphical user interface (GUI) for real-time digit recognition.">
 
 # Handwritten Digit Recognition with CNN
 
