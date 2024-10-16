@@ -12,7 +12,7 @@ def configure_environment():
 # Constants and hyperparameters
 NUM_CLASSES = 10
 INPUT_SHAPE = (28, 28, 1)
-EPOCHS = 5
+EPOCHS = 25
 BATCH_SIZE = 64
 FILTERS = [32, 64, 64]  # Number of filters in Conv2D layers
 KERNEL_SIZE = (3, 3)
