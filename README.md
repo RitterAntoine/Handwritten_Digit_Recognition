@@ -35,22 +35,18 @@ This project uses the [MNIST dataset](http://yann.lecun.com/exdb/mnist/), which 
 Follow these steps to set up the project on your local machine.
 
 1. **Clone the repository**:
-    ```bash
-    git clone https://github.com/RitterAntoine/Handwritten_Digit_Recognition.git
-    cd Handwritten_Digit_Recognition
-    ```
 
-2. **Install required dependencies using [UV](https://github.com/expo/uv)** (the fast package manager):
-    ```bash
-    uv install
-    ```
+```bash
+git clone https://github.com/RitterAntoine/Handwritten_Digit_Recognition.git
+cd Handwritten_Digit_Recognition
+```
 
-3. **Activate the virtual environment** (if using UV):
-    ```bash
-    uv shell
-    ```
+2. **Create venv and install dependancies**:
 
-   UV automatically creates and manages a virtual environment for your project.
+```bash
+uv venv
+uv sync
+```
 
 ## Usage
 
