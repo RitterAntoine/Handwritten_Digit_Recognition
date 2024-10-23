@@ -46,6 +46,7 @@ cd Handwritten_Digit_Recognition
 ```bash
 uv venv
 uv sync
+source .venv/bin/activate
 ```
 
 ## Usage
@@ -54,7 +55,7 @@ uv sync
 
 To train the CNN model on the MNIST dataset, run the following command:
 ```bash
-python generate_model.py
+uv run generate_model.py
 ```
 
 This script will:
