@@ -2,12 +2,7 @@ import os
 import warnings
 from keras.datasets import mnist # type: ignore
 from keras import layers, models
-
-# TensorFlow and CUDA configuration
-def configure_environment():
-    os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'  # Suppress TensorFlow logs
-    os.environ['CUDA_VISIBLE_DEVICES'] = '-1'  # Disable CUDA for CPU-only execution
-    warnings.filterwarnings("ignore", category=UserWarning, module='keras')  # Suppress Keras warnings
+import traceback
 
 # Constants and hyperparameters
 NUM_CLASSES = 10
@@ -61,17 +56,33 @@ def train_and_save_model(model, train_images, train_labels, epochs, batch_size, 
     model.save(save_path)
 
 def main():
-    # Configure the environment (suppress TensorFlow/CUDA logs)
-    configure_environment()
+    try:
+        # Load and preprocess the data
+        try:
+            (train_images, train_labels), (test_images, test_labels) = load_and_preprocess_data()
+        except Exception as e:
+            print(f"Error in load_and_preprocess_data: {e}")
+            traceback.print_exc()
+            return
 
-    # Load and preprocess the data
-    (train_images, train_labels), (test_images, test_labels) = load_and_preprocess_data()
+        # Build the CNN model
+        try:
+            model = build_model(INPUT_SHAPE, NUM_CLASSES)
+        except Exception as e:
+            print(f"Error in build_model: {e}")
+            traceback.print_exc()
+            return
 
-    # Build the CNN model
-    model = build_model(INPUT_SHAPE, NUM_CLASSES)
-
-    # Train and save the model
-    train_and_save_model(model, train_images, train_labels, EPOCHS, BATCH_SIZE)
+        # Train and save the model
+        try:
+            train_and_save_model(model, train_images, train_labels, EPOCHS, BATCH_SIZE)
+        except Exception as e:
+            print(f"Error in train_and_save_model: {e}")
+            traceback.print_exc()
+            return
+    except Exception as e:
+        print(f"An unexpected error occurred: {e}")
+        traceback.print_exc()
 
 if __name__ == "__main__":
     main()
