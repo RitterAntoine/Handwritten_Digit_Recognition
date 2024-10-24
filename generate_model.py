@@ -1,5 +1,6 @@
 import os
 import warnings
+import argparse
 from keras.datasets import mnist # type: ignore
 from keras import layers, models
 import traceback
@@ -7,7 +8,6 @@ import traceback
 # Constants and hyperparameters
 NUM_CLASSES = 10
 INPUT_SHAPE = (28, 28, 1)
-EPOCHS = 25
 BATCH_SIZE = 64
 FILTERS = [32, 64, 64]  # Number of filters in Conv2D layers
 KERNEL_SIZE = (3, 3)
@@ -29,7 +29,7 @@ def load_and_preprocess_data():
         
         return (train_images, train_labels), (test_images, test_labels)
     except Exception as e:
-        print(f"Error while loading and preprocessing the data: {e}")
+        print(f"Error in load_and_preprocess_data: {e}")
         traceback.print_exc()
         raise
 
@@ -47,18 +47,14 @@ def build_model(input_shape, num_classes):
             layers.Dense(num_classes, activation='softmax')
         ])
         
-    except Exception as e:
-        print(f"Error while building the model: {e}")
-        traceback.print_exc()
-        raise
-        
-    try:
+        # Compile the model
         model.compile(optimizer='adam', 
                       loss='sparse_categorical_crossentropy', 
                       metrics=['accuracy'])
+        
         return model
     except Exception as e:
-        print(f"Error while compiling the model: {e}")
+        print(f"Error in build_model: {e}")
         traceback.print_exc()
         raise
 
@@ -66,7 +62,6 @@ def train_and_save_model(model, train_images, train_labels, epochs, batch_size, 
     """Trains the model and saves the trained model to disk."""
     try:
         model.fit(train_images, train_labels, epochs=epochs, batch_size=batch_size)
-        
     except Exception as e:
         print(f"Error when training the model: {e}")
         traceback.print_exc()
@@ -75,21 +70,28 @@ def train_and_save_model(model, train_images, train_labels, epochs, batch_size, 
     try:
         # Save the trained model
         model.save(save_path)
-
     except Exception as e:
         print(f"Error when saving the model: {e}")
         traceback.print_exc()
         raise
 
 def main():
-    # Load and preprocess the data
-    (train_images, train_labels), (test_images, test_labels) = load_and_preprocess_data()
+    parser = argparse.ArgumentParser(description='Train a CNN model on the MNIST dataset.')
+    parser.add_argument('--epochs', type=int, default=25, help='Number of epochs for training')
+    args = parser.parse_args()
 
-    # Build the CNN model
-    model = build_model(INPUT_SHAPE, NUM_CLASSES)
-    
-    # Train and save the model
-    train_and_save_model(model, train_images, train_labels, EPOCHS, BATCH_SIZE)
+    try:
+        # Load and preprocess the data
+        (train_images, train_labels), (test_images, test_labels) = load_and_preprocess_data()
+
+        # Build the CNN model
+        model = build_model(INPUT_SHAPE, NUM_CLASSES)
+
+        # Train and save the model
+        train_and_save_model(model, train_images, train_labels, args.epochs, BATCH_SIZE)
+    except Exception as e:
+        print(f"An unexpected error occurred: {e}")
+        traceback.print_exc()
 
 if __name__ == "__main__":
     main()
