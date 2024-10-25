@@ -1,19 +1,27 @@
 import os
-os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'  # Suppress TensorFlow warnings
+os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
 
+import json
 import argparse
+import time
 from keras.datasets import mnist # type: ignore
 from keras import layers, models
+from keras.callbacks import EarlyStopping
 import traceback
 
-# Constants and hyperparameters
-NUM_CLASSES = 10
-INPUT_SHAPE = (28, 28, 1)
-BATCH_SIZE = 64
-FILTERS = [32, 64, 64]  # Number of filters in Conv2D layers
-KERNEL_SIZE = (3, 3)
-POOL_SIZE = (2, 2)
-DENSE_UNITS = 64
+# Load configuration from JSON file
+with open('config.json', 'r') as config_file:
+    config = json.load(config_file)
+
+# Constants and hyperparameters from config
+NUM_CLASSES = config['NUM_CLASSES']
+INPUT_SHAPE = tuple(config['INPUT_SHAPE'])
+BATCH_SIZE = config['BATCH_SIZE']
+FILTERS = config['FILTERS']
+KERNEL_SIZE = tuple(config['KERNEL_SIZE'])
+POOL_SIZE = tuple(config['POOL_SIZE'])
+DENSE_UNITS = config['DENSE_UNITS']
+MAXIMUM_EPOCHS = config['MAXIMUM_EPOCHS']
 
 def load_and_preprocess_data():
     """Loads and normalizes the MNIST dataset."""
@@ -60,18 +68,31 @@ def build_model(input_shape, num_classes):
         traceback.print_exc()
         raise
 
-def train_and_save_model(model, train_images, train_labels, epochs, batch_size, save_path='handwritten_digit_model.h5'):
+def train_and_save_model(model, train_images, train_labels, epochs, batch_size, save_path='handwritten_digit_model.keras'):
     """Trains the model and saves the trained model to disk."""
     try:
-        model.fit(train_images, train_labels, epochs=epochs, batch_size=batch_size)
+        if epochs is None:
+            print("Auto training started, it will stop when the model is detected as good...")  # Message for auto training
+            early_stopping = EarlyStopping(monitor='val_loss', patience=3, restore_best_weights=True)
+            callbacks = [early_stopping]
+            epochs = MAXIMUM_EPOCHS
+        else:
+            print(f"Starting training for {epochs} epochs...")  # Message for user-defined epochs
+            callbacks = []
+        
+        start_time = time.time()  # Record start time
+        model.fit(train_images, train_labels, epochs=epochs, batch_size=batch_size, validation_split=0.2, callbacks=callbacks)
+        end_time = time.time()  # Record end time
+        total_time = end_time - start_time  # Calculate total time
     except Exception as e:
         print(f"Error when training the model: {e}")
         traceback.print_exc()
         raise
 
     try:
-        # Save the trained model
+        # Save the trained model in the native Keras format
         model.save(save_path)
+        print(f"Best model found and saved successfully! Total training time: {total_time:.2f} seconds.")  # Message after saving the model
     except Exception as e:
         print(f"Error when saving the model: {e}")
         traceback.print_exc()
@@ -79,21 +100,16 @@ def train_and_save_model(model, train_images, train_labels, epochs, batch_size, 
 
 def main():
     parser = argparse.ArgumentParser(description='Train a CNN model on the MNIST dataset.')
-    parser.add_argument('--epochs', type=int, default=25, help='Number of epochs for training')
+    parser.add_argument('--epochs', '-ep', type=int, help='Number of epochs for training')
     args = parser.parse_args()
+    # Load and preprocess the data
+    (train_images, train_labels), (test_images, test_labels) = load_and_preprocess_data()
 
-    try:
-        # Load and preprocess the data
-        (train_images, train_labels), (test_images, test_labels) = load_and_preprocess_data()
+    # Build the CNN model
+    model = build_model(INPUT_SHAPE, NUM_CLASSES)
 
-        # Build the CNN model
-        model = build_model(INPUT_SHAPE, NUM_CLASSES)
-
-        # Train and save the model
-        train_and_save_model(model, train_images, train_labels, args.epochs, BATCH_SIZE)
-    except Exception as e:
-        print(f"An unexpected error occurred: {e}")
-        traceback.print_exc()
+    # Train and save the model
+    train_and_save_model(model, train_images, train_labels, args.epochs, BATCH_SIZE)
 
 if __name__ == "__main__":
     main()
