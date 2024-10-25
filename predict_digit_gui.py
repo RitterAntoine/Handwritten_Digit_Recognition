@@ -1,4 +1,7 @@
 import os
+# Suppress unnecessary logs and warnings
+os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
+os.environ['CUDA_VISIBLE_DEVICES'] = '-1'
 import warnings
 import numpy as np
 from keras import models
@@ -7,9 +10,6 @@ import tkinter as tk
 from tkinter import ttk
 import absl.logging
 
-# Suppress unnecessary logs and warnings
-os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
-os.environ['CUDA_VISIBLE_DEVICES'] = '-1'
 absl.logging.set_verbosity(absl.logging.ERROR)
 warnings.filterwarnings("ignore", category=UserWarning, module='keras')
 
@@ -77,7 +77,7 @@ class DigitRecognizerApp:
     def load_model(self):
         """Loads the trained model from a file."""
         try:
-            model = models.load_model('handwritten_digit_model.h5')
+            model = models.load_model('handwritten_digit_model.keras')
             print("Model loaded successfully.")
             return model
         except Exception as e:
