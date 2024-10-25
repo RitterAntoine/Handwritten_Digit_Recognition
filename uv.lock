@@ -280,6 +280,7 @@ dependencies = [
     { name = "matplotlib" },
     { name = "pillow" },
     { name = "tensorflow" },
+    { name = "tensorflow-cpu" },
     { name = "tk" },
 ]
 
@@ -289,6 +290,7 @@ requires-dist = [
     { name = "matplotlib", specifier = ">=3.9.2" },
     { name = "pillow", specifier = ">=11.0.0" },
     { name = "tensorflow", specifier = ">=2.17.0" },
+    { name = "tensorflow-cpu", specifier = ">=2.17.1" },
     { name = "tk", specifier = ">=0.1.0" },
 ]
 
@@ -840,6 +842,75 @@ wheels = [
     { url = "https://files.pythonhosted.org/packages/e5/db/a365f4bdb6a0067ea9cc0a4b27757e2755627f3ff29dcca4cce3d274662d/tensorflow-2.17.0-cp312-cp312-manylinux_2_17_aarch64.manylinux2014_aarch64.whl", hash = "sha256:72adfef0ee39dd641627906fd7b244fcf21bdd8a87216a998ed74d9c74653aff", size = 224039182 },
     { url = "https://files.pythonhosted.org/packages/d7/24/f7b5c130975303efa4a91341e294fd784b94910c2a4c0f0f0561e5fc7405/tensorflow-2.17.0-cp312-cp312-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:0ad7bfea6afb4ded3928ca5b24df9fda876cea4904c103a5163fcc0c3483e7a4", size = 601419499 },
     { url = "https://files.pythonhosted.org/packages/48/a7/2f03f6de3c4976db6d2a898c408feb491ca10399af1f6039d6bef3e6ba6a/tensorflow-2.17.0-cp312-cp312-win_amd64.whl", hash = "sha256:278bc80642d799adf08dc4e04f291aab603bba7457d50c1f9bc191ebbca83f43", size = 2045 },
+]
+
+[[package]]
+name = "tensorflow-cpu"
+version = "2.17.1"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "absl-py" },
+    { name = "astunparse" },
+    { name = "flatbuffers" },
+    { name = "gast" },
+    { name = "google-pasta" },
+    { name = "grpcio" },
+    { name = "h5py" },
+    { name = "keras" },
+    { name = "libclang" },
+    { name = "ml-dtypes" },
+    { name = "numpy" },
+    { name = "opt-einsum" },
+    { name = "packaging" },
+    { name = "protobuf" },
+    { name = "requests" },
+    { name = "setuptools" },
+    { name = "six" },
+    { name = "tensorboard" },
+    { name = "tensorflow-intel", marker = "platform_system == 'Windows'" },
+    { name = "tensorflow-io-gcs-filesystem", marker = "python_full_version < '3.12'" },
+    { name = "termcolor" },
+    { name = "typing-extensions" },
+    { name = "wrapt" },
+]
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/da/27/afecc02c2b99e7f14c4aefc983977344121a37516dac68312071eca8fb4c/tensorflow_cpu-2.17.1-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:4935d35d15924602605c839cb6cd5a578f89f626d8736f62065fe3a089b63b6f", size = 221239512 },
+    { url = "https://files.pythonhosted.org/packages/51/7d/f8db203f7107039ea069500bfd50626af3756cce6bc1d1e74749e5347ac3/tensorflow_cpu-2.17.1-cp311-cp311-win_amd64.whl", hash = "sha256:54e4be9d5f687229f9e2b91480afed27709a0efe56f642dc4d99b80fbbb98363", size = 7571 },
+    { url = "https://files.pythonhosted.org/packages/ae/01/58d8731d9e2408a05cada8d582f073e33ea041b9818c4e146e21ff4973c6/tensorflow_cpu-2.17.1-cp312-cp312-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:10567f927153f9789e7e7c92bac27f13ca22dfa0a60dc03a831343c96f4efb9e", size = 221357300 },
+    { url = "https://files.pythonhosted.org/packages/71/40/3ecf1edb287c48025ac9a4f91e6c0146c1af85016d74f9b03691161a1c9c/tensorflow_cpu-2.17.1-cp312-cp312-win_amd64.whl", hash = "sha256:c15e1af1c5007dc328448f30b2a0f15d01573dbd704f83f8704e0d018b296319", size = 7575 },
+]
+
+[[package]]
+name = "tensorflow-intel"
+version = "2.17.1"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "absl-py" },
+    { name = "astunparse" },
+    { name = "flatbuffers" },
+    { name = "gast" },
+    { name = "google-pasta" },
+    { name = "grpcio" },
+    { name = "h5py" },
+    { name = "keras" },
+    { name = "libclang" },
+    { name = "ml-dtypes" },
+    { name = "numpy" },
+    { name = "opt-einsum" },
+    { name = "packaging" },
+    { name = "protobuf" },
+    { name = "requests" },
+    { name = "setuptools" },
+    { name = "six" },
+    { name = "tensorboard" },
+    { name = "tensorflow-io-gcs-filesystem", marker = "python_full_version < '3.12'" },
+    { name = "termcolor" },
+    { name = "typing-extensions" },
+    { name = "wrapt" },
+]
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/00/ae/60aa6a9120cfe5d26cf8f4dff7248b2fe25798d036d58afecf1da4ff0528/tensorflow_intel-2.17.1-cp311-cp311-win_amd64.whl", hash = "sha256:8abd1fef0e4de4b97b08bfc9efd4e2352afefd9f2f9aa04e0691e67ea5a6e7ac", size = 382251128 },
+    { url = "https://files.pythonhosted.org/packages/8c/c0/0e6a6b78883e63d1e215efe27f6df9bc96809bf4768fa2a81654af8622c8/tensorflow_intel-2.17.1-cp312-cp312-win_amd64.whl", hash = "sha256:086b323b207857d163eec40256d13d4eb2a844342dbe73ee35cf8784be82e324", size = 382383602 },
 ]
 
 [[package]]

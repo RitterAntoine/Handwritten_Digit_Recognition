@@ -8,6 +8,7 @@ dependencies = [
     "keras>=3.6.0",
     "matplotlib>=3.9.2",
     "pillow>=11.0.0",
+    "tensorflow-cpu>=2.17.1",
     "tensorflow>=2.17.0",
     "tk>=0.1.0",
 ]
