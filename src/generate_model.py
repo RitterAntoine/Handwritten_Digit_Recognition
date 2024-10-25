@@ -1,27 +1,26 @@
 import os
-os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
-
-import json
+os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'  # Suppress TensorFlow warnings
 import argparse
 import time
+import traceback
 from keras.datasets import mnist # type: ignore
 from keras import layers, models
 from keras.callbacks import EarlyStopping
-import traceback
+from config_loader import load_config
 
 # Load configuration from JSON file
-with open('config.json', 'r') as config_file:
-    config = json.load(config_file)
+config = load_config()
+model_config = config['model_parameters']
 
 # Constants and hyperparameters from config
-NUM_CLASSES = config['NUM_CLASSES']
-INPUT_SHAPE = tuple(config['INPUT_SHAPE'])
-BATCH_SIZE = config['BATCH_SIZE']
-FILTERS = config['FILTERS']
-KERNEL_SIZE = tuple(config['KERNEL_SIZE'])
-POOL_SIZE = tuple(config['POOL_SIZE'])
-DENSE_UNITS = config['DENSE_UNITS']
-MAXIMUM_EPOCHS = config['MAXIMUM_EPOCHS']
+NUM_CLASSES = model_config['NUM_CLASSES']
+INPUT_SHAPE = tuple(model_config['INPUT_SHAPE'])
+BATCH_SIZE = model_config['BATCH_SIZE']
+FILTERS = model_config['FILTERS']
+KERNEL_SIZE = tuple(model_config['KERNEL_SIZE'])
+POOL_SIZE = tuple(model_config['POOL_SIZE'])
+DENSE_UNITS = model_config['DENSE_UNITS']
+MAXIMUM_EPOCHS = model_config['MAXIMUM_EPOCHS']
 
 def load_and_preprocess_data():
     """Loads and normalizes the MNIST dataset."""
@@ -68,7 +67,7 @@ def build_model(input_shape, num_classes):
         traceback.print_exc()
         raise
 
-def train_and_save_model(model, train_images, train_labels, epochs, batch_size, save_path='handwritten_digit_model.keras'):
+def train_and_save_model(model, train_images, train_labels, epochs, batch_size, save_path='../assets/models/handwritten_digit_model.keras'):
     """Trains the model and saves the trained model to disk."""
     try:
         if epochs is None:
@@ -102,14 +101,19 @@ def main():
     parser = argparse.ArgumentParser(description='Train a CNN model on the MNIST dataset.')
     parser.add_argument('--epochs', '-ep', type=int, help='Number of epochs for training')
     args = parser.parse_args()
-    # Load and preprocess the data
-    (train_images, train_labels), (test_images, test_labels) = load_and_preprocess_data()
 
-    # Build the CNN model
-    model = build_model(INPUT_SHAPE, NUM_CLASSES)
+    try:
+        # Load and preprocess the data
+        (train_images, train_labels), (test_images, test_labels) = load_and_preprocess_data()
 
-    # Train and save the model
-    train_and_save_model(model, train_images, train_labels, args.epochs, BATCH_SIZE)
+        # Build the CNN model
+        model = build_model(INPUT_SHAPE, NUM_CLASSES)
+
+        # Train and save the model
+        train_and_save_model(model, train_images, train_labels, args.epochs, BATCH_SIZE)
+    except Exception as e:
+        print(f"An unexpected error occurred: {e}")
+        traceback.print_exc()
 
 if __name__ == "__main__":
     main()

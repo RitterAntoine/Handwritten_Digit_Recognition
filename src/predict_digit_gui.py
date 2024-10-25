@@ -1,5 +1,4 @@
 import os
-# Suppress unnecessary logs and warnings
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
 os.environ['CUDA_VISIBLE_DEVICES'] = '-1'
 import warnings
@@ -9,18 +8,25 @@ from PIL import Image, ImageDraw
 import tkinter as tk
 from tkinter import ttk
 import absl.logging
+from config_loader import load_config
 
+# Load configuration from JSON file
+config = load_config()
+ui_config = config['ui_parameters']
+
+# Constants from config
+CANVAS_WIDTH = ui_config['CANVAS_WIDTH']
+CANVAS_HEIGHT = ui_config['CANVAS_HEIGHT']
+FONT_LARGE = tuple(ui_config['FONT_LARGE'])
+FONT_MEDIUM = tuple(ui_config['FONT_MEDIUM'])
+
+# Suppress unnecessary logs and warnings
 absl.logging.set_verbosity(absl.logging.ERROR)
 warnings.filterwarnings("ignore", category=UserWarning, module='keras')
 
-# Constants
-CANVAS_WIDTH = 800
-CANVAS_HEIGHT = 800
-FONT_LARGE = ('Helvetica', 24)
-FONT_MEDIUM = ('Helvetica', 16)
-
 class DigitRecognizerApp:
     def __init__(self, root: tk.Tk):
+        """Initialize the DigitRecognizerApp with the main Tkinter window."""
         self.root = root
         self.root.title("Draw a Digit")
         self.root.geometry("1400x950")  # Set the default window size
@@ -29,7 +35,7 @@ class DigitRecognizerApp:
 
         # Styling using ttk themes
         style = ttk.Style()
-        style.theme_use("clam")  # Use a more modern theme (you can try others like "default", "vista", etc.)
+        style.theme_use("clam")  # Use a more modern theme
 
         # Initialize last coordinates
         self.lastx, self.lasty = None, None
@@ -77,7 +83,7 @@ class DigitRecognizerApp:
     def load_model(self):
         """Loads the trained model from a file."""
         try:
-            model = models.load_model('handwritten_digit_model.keras')
+            model = models.load_model('../assets/models/handwritten_digit_model.keras')
             print("Model loaded successfully.")
             return model
         except Exception as e:
