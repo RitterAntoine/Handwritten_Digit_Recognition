@@ -89,6 +89,9 @@ def train_and_save_model(model, train_images, train_labels, epochs, batch_size, 
         raise
 
     try:
+        # Ensure the directory exists
+        os.makedirs(os.path.dirname(save_path), exist_ok=True)
+        
         # Save the trained model in the native Keras format
         model.save(save_path)
         print(f"Best model found and saved successfully! Total training time: {total_time:.2f} seconds.")  # Message after saving the model
