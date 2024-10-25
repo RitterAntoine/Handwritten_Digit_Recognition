@@ -1,5 +1,6 @@
 import os
-import warnings
+os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'  # Suppress TensorFlow warnings
+
 import argparse
 from keras.datasets import mnist # type: ignore
 from keras import layers, models
@@ -37,7 +38,8 @@ def build_model(input_shape, num_classes):
     """Builds and compiles a CNN model for image classification."""
     try:
         model = models.Sequential([
-            layers.Conv2D(FILTERS[0], KERNEL_SIZE, activation='relu', input_shape=input_shape),
+            layers.Input(shape=input_shape),
+            layers.Conv2D(FILTERS[0], KERNEL_SIZE, activation='relu'),
             layers.MaxPooling2D(POOL_SIZE),
             layers.Conv2D(FILTERS[1], KERNEL_SIZE, activation='relu'),
             layers.MaxPooling2D(POOL_SIZE),
