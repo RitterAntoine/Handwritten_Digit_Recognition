@@ -55,7 +55,7 @@ source .venv/bin/activate
 
 To train the CNN model on the MNIST dataset, run the following command:
 ```bash
-uv run generate_model.py
+uv run train_model.py
 ```
 
 This script will:
@@ -97,9 +97,9 @@ uv install
 
 Project Structure
 ```
-├── generate_model.py        # Script to train the CNN model on the MNIST dataset
+├── train_model.py        # Script to train the CNN model on the MNIST dataset
 ├── predict_digit_gui.py     # Script to run the GUI for drawing digits and predicting results
-├── handwritten_digit_model.h5 # Trained model (generated after running generate_model.py)
+├── handwritten_digit_model.h5 # Trained model (traind after running train_model.py)
 ├── requirements.txt         # List of required dependencies
 ├── README.md                # Project documentation (this file)
 └── assets/                  # Directory containing example images or assets for the README
