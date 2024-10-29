@@ -7,7 +7,11 @@
         "KERNEL_SIZE": [3, 3],
         "POOL_SIZE": [2, 2],
         "DENSE_UNITS": 64,
-        "MAXIMUM_EPOCHS": 1000
+        "MAXIMUM_EPOCHS": 1000,
+        "ROTATION_RANGE": 10,
+        "WIDTH_SHIFT_RANGE": 0.1,
+        "HEIGHT_SHIFT_RANGE": 0.1,
+        "ZOOM_RANGE": 0.1
     },
     "ui_parameters": {
         "CANVAS_WIDTH": 800,
