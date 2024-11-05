@@ -1,14 +1,19 @@
 import os
-os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
-os.environ['CUDA_VISIBLE_DEVICES'] = '-1'
 import warnings
 import numpy as np
 from keras import models
 from PIL import Image, ImageDraw
-import tkinter as tk
-from tkinter import ttk
+from PyQt5.QtWidgets import QApplication, QWidget, QVBoxLayout, QHBoxLayout, QLabel, QPushButton, QFrame, QGraphicsScene, QGraphicsView, QMessageBox
+from PyQt5.QtGui import QBrush, QPen, QImage, QPainter, QPixmap
+from PyQt5.QtCore import Qt, QPoint
 import absl.logging
 from config_loader import load_config
+
+# Suppress unnecessary logs and warnings
+os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
+os.environ['CUDA_VISIBLE_DEVICES'] = '-1'
+absl.logging.set_verbosity(absl.logging.ERROR)
+warnings.filterwarnings("ignore", category=UserWarning, module='keras')
 
 # Load configuration from JSON file
 config = load_config()
@@ -17,68 +22,62 @@ ui_config = config['ui_parameters']
 # Constants from config
 CANVAS_WIDTH = ui_config['CANVAS_WIDTH']
 CANVAS_HEIGHT = ui_config['CANVAS_HEIGHT']
-FONT_LARGE = tuple(ui_config['FONT_LARGE'])
-FONT_MEDIUM = tuple(ui_config['FONT_MEDIUM'])
+FONT_LARGE = ui_config['FONT_LARGE']
+FONT_MEDIUM = ui_config['FONT_MEDIUM']
 
-# Suppress unnecessary logs and warnings
-absl.logging.set_verbosity(absl.logging.ERROR)
-warnings.filterwarnings("ignore", category=UserWarning, module='keras')
-
-class DigitRecognizerApp:
-    def __init__(self, root: tk.Tk):
-        """Initialize the DigitRecognizerApp with the main Tkinter window."""
-        self.root = root
-        self.root.title("Draw a Digit")
-        self.root.geometry("1400x950")  # Set the default window size
-
+class DigitRecognizerApp(QWidget):
+    def __init__(self):
+        """Initialize the DigitRecognizerApp with the main window."""
+        super().__init__()
+        self.setWindowTitle("Draw a Digit")
+        self.setGeometry(100, 100, 1400, 950)
         self.model = self.load_model()
-
-        # Styling using ttk themes
-        style = ttk.Style()
-        style.theme_use("clam")  # Use a more modern theme
-
-        # Initialize last coordinates
-        self.lastx, self.lasty = None, None
-        
-        # Set up the main frame using grid layout
-        self.main_frame = ttk.Frame(root)
-        self.main_frame.grid(row=0, column=0, padx=20, pady=20)
-
-        # Set up the canvas frame with a border for styling
-        self.canvas_frame = ttk.Frame(self.main_frame, borderwidth=2, relief='groove')
-        self.canvas_frame.grid(row=0, column=0, padx=20, pady=20)
-
-        # Set up the canvas for drawing
-        self.canvas = tk.Canvas(self.canvas_frame, width=CANVAS_WIDTH, height=CANVAS_HEIGHT, bg='white')
-        self.canvas.pack()
-
-        # Set up the image and drawing context
+        self.last_point = None
         self.image = Image.new('L', (CANVAS_WIDTH, CANVAS_HEIGHT), 'white')
         self.draw = ImageDraw.Draw(self.image)
 
-        # Bind the paint function to the canvas
-        self.canvas.bind('<B1-Motion>', self.paint)
-        self.canvas.bind('<ButtonRelease-1>', self.reset)
+        self.init_ui()
 
-        # Set up the prediction frame on the right side
-        self.prediction_frame = ttk.Frame(self.main_frame)
-        self.prediction_frame.grid(row=0, column=1, sticky='n', padx=20)
+    def init_ui(self):
+        """Set up the UI components."""
+        layout = QHBoxLayout()
+        self.setLayout(layout)
 
-        # Set up the label to display the result
-        self.result_label = ttk.Label(self.prediction_frame, text='Predicted Digit: None', font=FONT_LARGE)
-        self.result_label.grid(row=0, column=0, pady=10)
+        # Scene for drawing
+        self.canvas_scene = QGraphicsScene(self)
+        self.canvas_view = QGraphicsView(self.canvas_scene)
+        self.canvas_view.setRenderHint(QPainter.Antialiasing)
+        self.canvas_view.setFixedSize(CANVAS_WIDTH, CANVAS_HEIGHT)
+        layout.addWidget(self.canvas_view)
 
-        # Set up the label to display the probabilities
-        self.probabilities_label = ttk.Label(self.prediction_frame, text='Probabilities: None', font=FONT_MEDIUM, wraplength=300, justify='left')
-        self.probabilities_label.grid(row=1, column=0, pady=10)
+        # Setup prediction display
+        self.prediction_layout = QVBoxLayout()
+        layout.addLayout(self.prediction_layout)
 
-        # Set up the clear button with larger size and padding
-        self.clear_button = ttk.Button(self.prediction_frame, text='Clear Canvas', command=self.clear_canvas, width=20)
-        self.clear_button.grid(row=2, column=0, pady=20, padx=20, ipady=10)
+        self.result_label = QLabel('Predicted Digit: None')
+        self.prediction_layout.addWidget(self.result_label)
 
-        # Set up an exit button with larger size and padding
-        self.exit_button = ttk.Button(self.prediction_frame, text='Exit', command=self.root.quit, width=20)
-        self.exit_button.grid(row=3, column=0, pady=20, padx=20, ipady=10)
+        self.probabilities_label = QLabel('Probabilities: None')
+        self.prediction_layout.addWidget(self.probabilities_label)
+
+        self.clear_button = QPushButton('Clear Canvas')
+        self.clear_button.clicked.connect(self.clear_canvas)
+        self.prediction_layout.addWidget(self.clear_button)
+
+        self.exit_button = QPushButton('Exit')
+        self.exit_button.clicked.connect(self.close)
+        self.prediction_layout.addWidget(self.exit_button)
+
+        # Set up mouse events
+        self.canvas_view.setMouseTracking(True)
+        self.canvas_view.mousePressEvent = self.start_drawing
+        self.canvas_view.mouseMoveEvent = self.draw_on_canvas
+        self.canvas_view.mouseReleaseEvent = self.stop_drawing
+
+        # Create a QPixmap to draw on
+        self.pixmap = QPixmap(CANVAS_WIDTH, CANVAS_HEIGHT)
+        self.pixmap.fill(Qt.white)  # Fill with white to start
+        self.canvas_scene.addPixmap(self.pixmap)
 
     def load_model(self):
         """Loads the trained model from a file."""
@@ -87,66 +86,67 @@ class DigitRecognizerApp:
             print("Model loaded successfully.")
             return model
         except Exception as e:
-            print(f"Error loading model: {e}")
-            self.root.quit()
+            QMessageBox.critical(self, "Error", f"Error loading model: {e}")
+            self.close()
 
     def preprocess_image(self, image: Image.Image) -> np.ndarray:
         """Converts the drawn image to a 28x28 grayscale image and normalizes it."""
         image = image.resize((28, 28)).convert('L')  # Resize and convert to grayscale
-        img_array = np.array(image)  # Convert to numpy array
-        img_array = img_array / 255.0  # Normalize to [0, 1]
-        img_array = img_array.reshape(1, 28, 28, 1)  # Reshape for the model
-        return img_array
+        img_array = np.array(image) / 255.0  # Normalize to [0, 1]
+        return img_array.reshape(1, 28, 28, 1)  # Reshape for the model
 
     def predict_digit(self, image: Image.Image) -> np.ndarray:
         """Predicts the digit from the processed image."""
         processed_image = self.preprocess_image(image)
-        prediction = self.model.predict(processed_image)
-        return prediction
+        return self.model.predict(processed_image)
 
-    def paint(self, event: tk.Event):
-        """Draws on the canvas."""
-        x1, y1 = (event.x - 10), (event.y - 10)
-        x2, y2 = (event.x + 10), (event.y + 10)
-        self.canvas.create_oval(x1, y1, x2, y2, fill='black', width=20)
-        self.draw.ellipse([x1, y1, x2, y2], fill='black', width=20)
+    def start_drawing(self, event):
+        """Starts the drawing process on mouse press."""
+        self.last_point = QPoint(event.pos())
+        self.draw_on_canvas(event)
 
-        if self.lastx and self.lasty:
-            self.canvas.create_line(self.lastx, self.lasty, event.x, event.y, fill='black', width=20)
-            self.draw.line([self.lastx, self.lasty, event.x, event.y], fill='black', width=20)
+    def draw_on_canvas(self, event):
+        """Draws on the canvas while the mouse is moved."""
+        if self.last_point is not None:
+            painter = QPainter(self.pixmap)  # Draw on the pixmap
+            brush = QBrush(Qt.black)
+            painter.setBrush(brush)
+            painter.setPen(QPen(Qt.black, 20, Qt.SolidLine))
+            current_point = QPoint(event.pos())
+            painter.drawLine(self.last_point, current_point)
+            self.draw.line((self.last_point.x(), self.last_point.y(), current_point.x(), current_point.y()), fill='black', width=20)
+            self.last_point = current_point
+            self.canvas_scene.clear()  # Clear the scene before re-adding the pixmap
+            self.canvas_scene.addPixmap(self.pixmap)  # Add the updated pixmap to the scene
 
-        self.lastx, self.lasty = event.x, event.y
-
-    def reset(self, event: tk.Event):
-        """Resets the last coordinates and makes a prediction."""
-        self.lastx, self.lasty = None, None
-        self.handle_predict()  # Make a prediction when the user finishes drawing
+    def stop_drawing(self, event):
+        """Stops the drawing process on mouse release and makes a prediction."""
+        self.last_point = None
+        self.handle_predict()
 
     def clear_canvas(self):
-        """Clears the canvas."""
-        self.canvas.delete('all')
-        self.draw.rectangle((0, 0, CANVAS_WIDTH, CANVAS_HEIGHT), fill='white')
-        self.result_label.config(text='Predicted Digit: None')  # Reset the prediction label
-        self.probabilities_label.config(text='Probabilities: None')  # Reset the probabilities label
+        """Clears the canvas and resets predictions."""
+        self.pixmap.fill(Qt.white)  # Fill the pixmap with white
+        self.canvas_scene.clear()
+        self.canvas_scene.addPixmap(self.pixmap)  # Add the clear pixmap back to the scene
+        self.result_label.setText('Predicted Digit: None')
+        self.probabilities_label.setText('Probabilities: None')
 
     def handle_predict(self):
         """Handles the prediction and displays the result."""
         prediction = self.predict_digit(self.image)
         predicted_digit = np.argmax(prediction)
-        self.result_label.config(text=f'Predicted Digit: {predicted_digit}')
+        self.result_label.setText(f'Predicted Digit: {predicted_digit}')
 
-        # Get probabilities and sort them in descending order
         probabilities = prediction[0]
         sorted_indices = np.argsort(probabilities)[::-1]
         sorted_probabilities = [(i, probabilities[i]) for i in sorted_indices]
 
-        # Display probabilities
         probabilities_text = "Probabilities:\n" + "\n".join([f"{digit}: {prob:.4f}" for digit, prob in sorted_probabilities])
-        self.probabilities_label.config(text=probabilities_text)
+        self.probabilities_label.setText(probabilities_text)
 
-# Set up the main application window
-root = tk.Tk()
-app = DigitRecognizerApp(root)
-
-# Start the Tkinter main loop
-root.mainloop()
+if __name__ == "__main__":
+    app = QApplication([])
+    digit_recognizer = DigitRecognizerApp()
+    digit_recognizer.show()
+    app.exec_()
