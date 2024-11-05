@@ -1,18 +1,17 @@
 import os
+os.environ["CUDA_VISIBLE_DEVICES"] = "-1"
+os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
 import warnings
 import numpy as np
+from config_loader import load_config
 from keras import models
 from PIL import Image, ImageDraw
 from PyQt5.QtWidgets import QApplication, QWidget, QVBoxLayout, QHBoxLayout, QLabel, QPushButton, QFrame, QGraphicsScene, QGraphicsView, QMessageBox
 from PyQt5.QtGui import QBrush, QPen, QImage, QPainter, QPixmap
 from PyQt5.QtCore import Qt, QPoint
-import absl.logging
-from config_loader import load_config
+import tensorflow as tf
+tf.config.set_visible_devices([], 'GPU')
 
-# Suppress unnecessary logs and warnings
-os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
-os.environ['CUDA_VISIBLE_DEVICES'] = '-1'
-absl.logging.set_verbosity(absl.logging.ERROR)
 warnings.filterwarnings("ignore", category=UserWarning, module='keras')
 
 # Load configuration from JSON file
