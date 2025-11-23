@@ -103,7 +103,7 @@
 <body>
 
     <h1>Digit Recognition</h1>
-    <p class="subtitle">Draw a digit (0-9). Auto-prediction in 1.5s.</p>
+    <p class="subtitle">Draw a digit (0-9). Auto-prediction in 1s.</p>
 
     <div class="container">
         <div class="canvas-container">
@@ -147,8 +147,8 @@
             if (isDrawing) {
                 isDrawing = false;
                 ctx.beginPath();
-                // Start debounce timer: predict after 1.5s of inactivity
-                predictTimer = setTimeout(predictDigit, 1500);
+                // Start debounce timer: predict after 1s of inactivity
+                predictTimer = setTimeout(predictDigit, 1000);
             }
         }
 
