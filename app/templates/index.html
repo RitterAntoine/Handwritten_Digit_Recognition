@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MNIST AI - Antoine Ritter</title>
+    <style>
+        /* --- ANTOINE RITTER DA / PORTFOLIO STYLE --- */
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap');
+
+        body {
+            background-color: #0a0a0a;
+            color: #ffffff;
+            font-family: 'Inter', sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            margin: 0;
+        }
+
+        h1 { font-weight: 800; margin-bottom: 5px; }
+        p.subtitle { color: #888; margin-top: 0; margin-bottom: 30px; }
+
+        .container {
+            display: flex;
+            gap: 40px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .canvas-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        canvas {
+            background-color: #111;
+            border: 1px solid #333;
+            border-radius: 12px;
+            cursor: crosshair;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+            touch-action: none; /* Crucial for mobile touch support */
+        }
+
+        .controls {
+            margin-top: 15px;
+            width: 100%;
+            display: flex;
+            justify-content: center;
+        }
+
+        button {
+            background: #222;
+            color: #aaa;
+            border: 1px solid #333;
+            padding: 8px 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-family: 'Inter', sans-serif;
+            font-size: 0.9rem;
+            transition: all 0.2s;
+        }
+
+        button:hover { background: #333; color: white; border-color: #555; }
+
+        /* Result Card */
+        .result-card {
+            width: 280px;
+            height: 280px;
+            background: #1c1c1c;
+            border: 1px solid #333;
+            border-radius: 12px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+
+        .digit { font-size: 8rem; font-weight: 800; margin: 0; color: #fff; line-height: 1; }
+        .conf { color: #4CAF50; font-size: 1rem; margin-top: 10px; }
+        .placeholder { color: #333; font-size: 5rem; user-select: none; }
+        
+        /* Status Indicator Dot */
+        .status-indicator {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background-color: #333;
+            transition: background-color 0.3s;
+        }
+        .status-thinking { background-color: #FFA500; box-shadow: 0 0 10px #FFA500; }
+        .status-success { background-color: #4CAF50; box-shadow: 0 0 10px #4CAF50; }
+
+    </style>
+</head>
+<body>
+
+    <h1>Digit Recognition</h1>
+    <p class="subtitle">Draw a digit (0-9). Auto-prediction in 1.5s.</p>
+
+    <div class="container">
+        <div class="canvas-container">
+            <canvas id="canvas" width="280" height="280"></canvas>
+            <div class="controls">
+                <button onclick="clearCanvas()">Erase Canvas</button>
+            </div>
+        </div>
+
+        <div class="result-card" id="result-box">
+            <div id="status" class="status-indicator"></div>
+            <span class="placeholder">?</span>
+        </div>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+        const resultBox = document.getElementById('result-box');
+        const statusDot = document.getElementById('status');
+        
+        let isDrawing = false;
+        let predictTimer = null; // Stores the timeout ID
+
+        // Drawing Style Configuration
+        ctx.strokeStyle = "white";
+        ctx.lineWidth = 15;
+        ctx.lineCap = "round";
+        ctx.lineJoin = "round";
+
+        // --- EVENT HANDLERS (MOUSE & TOUCH) ---
+        
+        function startDrawing(e) {
+            isDrawing = true;
+            clearTimeout(predictTimer); // User is drawing, cancel pending prediction
+            statusDot.className = "status-indicator"; // Reset status
+            draw(e);
+        }
+
+        function stopDrawing() {
+            if (isDrawing) {
+                isDrawing = false;
+                ctx.beginPath();
+                // Start debounce timer: predict after 1.5s of inactivity
+                predictTimer = setTimeout(predictDigit, 1500);
+            }
+        }
+
+        function draw(e) {
+            if (!isDrawing) return;
+            e.preventDefault(); // Prevent scrolling on touch devices
+            
+            const rect = canvas.getBoundingClientRect();
+            // Handle both Mouse and Touch events
+            const clientX = e.clientX || e.touches[0].clientX;
+            const clientY = e.clientY || e.touches[0].clientY;
+            
+            const x = clientX - rect.left;
+            const y = clientY - rect.top;
+
+            ctx.lineTo(x, y);
+            ctx.stroke();
+            ctx.beginPath();
+            ctx.moveTo(x, y);
+        }
+
+        // Mouse Events
+        canvas.addEventListener('mousedown', startDrawing);
+        canvas.addEventListener('mousemove', draw);
+        canvas.addEventListener('mouseup', stopDrawing);
+        canvas.addEventListener('mouseout', stopDrawing);
+
+        // Touch Events (Mobile/Tablet)
+        canvas.addEventListener('touchstart', startDrawing);
+        canvas.addEventListener('touchmove', draw);
+        canvas.addEventListener('touchend', stopDrawing);
+
+        // --- LOGIC FUNCTIONS ---
+
+        function clearCanvas() {
+            clearTimeout(predictTimer); // Cancel any pending prediction
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.beginPath();
+            resultBox.innerHTML = '<div id="status" class="status-indicator"></div><span class="placeholder">?</span>';
+            // Re-select statusDot because DOM was overwritten
+            document.getElementById('status').className = "status-indicator";
+        }
+
+        async function predictDigit() {
+            // UI Feedback: "Thinking" state (Orange Dot)
+            const dot = document.getElementById('status');
+            if(dot) dot.className = "status-indicator status-thinking";
+
+            const imageData = canvas.toDataURL('image/png');
+
+            try {
+                const response = await fetch('/predict', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ image: imageData })
+                });
+
+                const data = await response.json();
+
+                if (data.digit !== undefined) {
+                    resultBox.innerHTML = `
+                        <div id="status" class="status-indicator status-success"></div>
+                        <p class="digit">${data.digit}</p>
+                        <p class="conf">Confidence: ${data.confidence}</p>
+                    `;
+                }
+            } catch (error) {
+                console.error(error);
+                alert("Error: Is the Python server running?");
+            }
+        }
+    </script>
+</body>
+</html>
