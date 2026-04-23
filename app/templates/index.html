@@ -1,225 +1,652 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="fr">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MNIST AI - Antoine Ritter</title>
-    <style>
-        /* --- ANTOINE RITTER DA / PORTFOLIO STYLE --- */
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap');
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>MNIST // antoinenitter.fr</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;700&display=swap" rel="stylesheet"/>
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+<style>
+:root {
+  --green: #39ff14;
+  --green-dim: #1a7a06;
+  --green-glow: rgba(57,255,20,0.18);
+  --amber: #ffb700;
+  --red: #ff3b3b;
+  --bg: #050905;
+  --bg2: #0b110b;
+  --bg3: #0f170f;
+  --border: rgba(57,255,20,0.15);
+  --border-bright: rgba(57,255,20,0.4);
+  --text-muted: rgba(57,255,20,0.4);
+  --text-dim: rgba(57,255,20,0.65);
+}
+* { margin:0; padding:0; box-sizing:border-box; }
+body {
+  background: var(--bg);
+  color: var(--green);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 13px;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+body::before {
+  content:'';
+  position: fixed;
+  inset: 0;
+  background: repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,0.12) 2px,rgba(0,0,0,0.12) 4px);
+  pointer-events: none;
+  z-index: 1000;
+}
+body::after {
+  content:'';
+  position: fixed;
+  inset: 0;
+  background: radial-gradient(ellipse at center, transparent 60%, rgba(0,0,0,0.6) 100%);
+  pointer-events: none;
+  z-index: 999;
+}
+@keyframes blink { 0%,100%{opacity:1} 50%{opacity:0} }
+@keyframes fadeIn { from{opacity:0;transform:translateY(4px)} to{opacity:1;transform:translateY(0)} }
+@keyframes flicker { 0%,100%{opacity:1} 92%{opacity:1} 93%{opacity:.8} 94%{opacity:1} 96%{opacity:.9} 97%{opacity:1} }
+@keyframes pulse { 0%,100%{box-shadow:0 0 8px var(--green)} 50%{box-shadow:0 0 20px var(--green),0 0 40px rgba(57,255,20,0.3)} }
+@keyframes spin { from{transform:rotate(0deg)} to{transform:rotate(360deg)} }
 
-        body {
-            background-color: #0a0a0a;
-            color: #ffffff;
-            font-family: 'Inter', sans-serif;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            min-height: 100vh;
-            margin: 0;
-        }
+.cursor {
+  display: inline-block;
+  width: 8px; height: 14px;
+  background: var(--green);
+  animation: blink 1.1s step-end infinite;
+  vertical-align: middle;
+  margin-left: 2px;
+  box-shadow: 0 0 6px var(--green);
+}
 
-        h1 { font-weight: 800; margin-bottom: 5px; }
-        p.subtitle { color: #888; margin-top: 0; margin-bottom: 30px; }
+::-webkit-scrollbar { width: 4px; }
+::-webkit-scrollbar-track { background: var(--bg); }
+::-webkit-scrollbar-thumb { background: var(--green-dim); border-radius: 2px; }
 
-        .container {
-            display: flex;
-            gap: 40px;
-            flex-wrap: wrap;
-            justify-content: center;
-        }
+#root {
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 32px 24px 80px;
+  animation: flicker 8s infinite;
+}
 
-        .canvas-container {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
+/* Header */
+.header {
+  border: 1px solid var(--border);
+  padding: 20px 24px;
+  margin-bottom: 24px;
+  background: var(--bg2);
+  position: relative;
+  overflow: hidden;
+}
+.header::before {
+  content:'';
+  position:absolute;
+  top:0;left:0;right:0;
+  height:1px;
+  background: linear-gradient(90deg, transparent, var(--green), transparent);
+  box-shadow: 0 0 10px var(--green);
+}
+.header-top { display:flex; align-items:center; justify-content:space-between; margin-bottom:12px; }
+.header-title {
+  font-size:22px; font-weight:700; letter-spacing:0.2em; text-transform:uppercase;
+  color:var(--green); text-shadow: 0 0 12px var(--green), 0 0 30px rgba(57,255,20,0.2);
+}
+.header-sub { color:var(--text-muted); font-size:11px; letter-spacing:0.1em; margin-top:4px; }
+.clock { font-size:11px; color:var(--text-dim); letter-spacing:0.08em; }
+.stats-row { display:flex; gap:32px; padding-top:12px; border-top:1px solid var(--border); flex-wrap:wrap; }
+.stat-item { display:flex; flex-direction:column; gap:2px; }
+.stat-val { font-size:20px; font-weight:700; color:var(--green); text-shadow:0 0 8px rgba(57,255,20,0.4); }
+.stat-lbl { font-size:10px; color:var(--text-muted); letter-spacing:0.1em; text-transform:uppercase; }
 
-        canvas {
-            background-color: #111;
-            border: 1px solid #333;
-            border-radius: 12px;
-            cursor: crosshair;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.5);
-            touch-action: none; /* Crucial for mobile touch support */
-        }
+/* Main grid */
+.main-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+@media (max-width: 680px) {
+  .main-grid { grid-template-columns: 1fr; }
+}
 
-        .controls {
-            margin-top: 15px;
-            width: 100%;
-            display: flex;
-            justify-content: center;
-        }
+/* Panel */
+.panel {
+  border: 1px solid var(--border);
+  background: var(--bg2);
+  position: relative;
+  overflow: hidden;
+}
+.panel-header {
+  display:flex; align-items:center; justify-content:space-between;
+  padding: 10px 16px;
+  border-bottom: 1px solid var(--border);
+  font-size:10px; letter-spacing:0.12em; text-transform:uppercase; color:var(--text-muted);
+}
+.panel-header span { color:var(--green); font-weight:500; }
+.panel-body { padding: 16px; }
 
-        button {
-            background: #222;
-            color: #aaa;
-            border: 1px solid #333;
-            padding: 8px 16px;
-            border-radius: 8px;
-            cursor: pointer;
-            font-family: 'Inter', sans-serif;
-            font-size: 0.9rem;
-            transition: all 0.2s;
-        }
+/* Canvas container */
+.canvas-wrap {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+}
+.canvas-zone {
+  position:relative;
+  border: 1px solid var(--border-bright);
+  cursor: crosshair;
+  display:block;
+}
+.canvas-zone:hover { box-shadow: 0 0 16px var(--green-glow); }
+canvas { display:block; }
 
-        button:hover { background: #333; color: white; border-color: #555; }
+/* Buttons */
+.btn-row { display:flex; gap:8px; width:100%; }
+.btn {
+  flex:1;
+  display: inline-flex; align-items:center; justify-content:center; gap:8px;
+  padding: 10px 0;
+  border: 1px solid var(--border-bright);
+  background: transparent;
+  color: var(--text-dim);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 12px; cursor:pointer; letter-spacing:0.1em;
+  transition: all 0.15s;
+  text-transform: uppercase;
+}
+.btn:hover { color:var(--green); border-color:var(--green); background:rgba(57,255,20,0.04); }
+.btn.primary {
+  color:var(--bg); background:var(--green); border-color:var(--green);
+  font-weight:700; text-shadow:none;
+  box-shadow: 0 0 10px var(--green-glow);
+}
+.btn.primary:hover { box-shadow: 0 0 20px var(--green-glow), 0 0 8px var(--green); }
+.btn.primary:disabled { opacity:0.4; cursor:not-allowed; box-shadow:none; }
+.btn.loading .spin { animation:spin 0.8s linear infinite; display:inline-block; }
 
-        /* Result Card */
-        .result-card {
-            width: 280px;
-            height: 280px;
-            background: #1c1c1c;
-            border: 1px solid #333;
-            border-radius: 12px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            position: relative;
-        }
+/* Confidence bars */
+.conf-list { display:flex; flex-direction:column; gap:6px; }
+.conf-row { display:flex; align-items:center; gap:10px; }
+.conf-digit {
+  width:24px; text-align:right; font-size:14px; font-weight:700;
+  flex-shrink:0; color:var(--text-dim);
+}
+.conf-digit.winner { color:var(--green); text-shadow:0 0 8px var(--green); }
+.conf-bar-bg {
+  flex:1; height:16px; background:rgba(57,255,20,0.06);
+  border: 1px solid var(--border); position:relative; overflow:hidden;
+}
+.conf-bar-fill {
+  height:100%;
+  background: var(--green);
+  opacity:0.7;
+  transition: width 0.5s cubic-bezier(0.22,1,0.36,1);
+}
+.conf-bar-fill.winner { opacity:1; box-shadow: 0 0 8px var(--green); }
+.conf-pct {
+  width:42px; text-align:right; font-size:11px; color:var(--text-muted); flex-shrink:0;
+}
+.conf-pct.winner { color:var(--green); }
 
-        .digit { font-size: 8rem; font-weight: 800; margin: 0; color: #fff; line-height: 1; }
-        .conf { color: #4CAF50; font-size: 1rem; margin-top: 10px; }
-        .placeholder { color: #333; font-size: 5rem; user-select: none; }
-        
-        /* Status Indicator Dot */
-        .status-indicator {
-            position: absolute;
-            top: 15px;
-            right: 15px;
-            width: 10px;
-            height: 10px;
-            border-radius: 50%;
-            background-color: #333;
-            transition: background-color 0.3s;
-        }
-        .status-thinking { background-color: #FFA500; box-shadow: 0 0 10px #FFA500; }
-        .status-success { background-color: #4CAF50; box-shadow: 0 0 10px #4CAF50; }
+/* Big prediction */
+.pred-display {
+  display:flex; flex-direction:column; align-items:center; justify-content:center;
+  gap:8px; padding:16px 0;
+}
+.pred-digit {
+  font-size:96px; font-weight:700; line-height:1;
+  color:var(--green);
+  text-shadow: 0 0 20px var(--green), 0 0 60px rgba(57,255,20,0.3);
+  animation: pulse 2s ease-in-out infinite;
+}
+.pred-label { font-size:10px; letter-spacing:0.15em; text-transform:uppercase; color:var(--text-muted); }
+.pred-conf { font-size:22px; font-weight:700; color:var(--amber); text-shadow:0 0 8px rgba(255,183,0,0.4); }
 
-    </style>
+/* Idle state */
+.idle-state {
+  display:flex; flex-direction:column; align-items:center; justify-content:center;
+  gap:8px; padding:20px 0; color:var(--text-muted); font-size:11px; letter-spacing:0.1em;
+  text-align:center; line-height:1.8;
+}
+.idle-big { font-size:48px; opacity:0.15; font-weight:700; }
+
+/* Log */
+.log-panel { border:1px solid var(--border); background:var(--bg2); }
+.log-header {
+  padding:10px 16px; border-bottom:1px solid var(--border);
+  font-size:10px; letter-spacing:0.12em; text-transform:uppercase;
+  display:flex; align-items:center; justify-content:space-between; color:var(--text-muted);
+}
+.log-body { padding:12px 16px; height:180px; overflow-y:auto; display:flex; flex-direction:column; gap:4px; }
+.log-entry { font-size:11px; line-height:1.5; animation:fadeIn 0.2s ease; }
+.log-time { color:var(--text-muted); margin-right:8px; }
+.log-ok { color:var(--green); }
+.log-warn { color:var(--amber); }
+.log-err { color:var(--red); }
+.log-dim { color:var(--text-dim); }
+
+/* 28x28 preview */
+.preview-28 {
+  image-rendering: pixelated;
+  border:1px solid var(--border);
+  opacity:0.7;
+}
+
+/* Tweaks */
+.tweaks-panel {
+  position:fixed; bottom:24px; right:24px; width:220px;
+  background:var(--bg3); border:1px solid var(--border-bright);
+  padding:16px; z-index:500;
+  box-shadow:0 0 20px var(--green-glow);
+  animation:fadeIn 0.2s ease;
+}
+.tweaks-btn {
+  position:fixed; bottom:24px; right:24px;
+  background:var(--bg3); border:1px solid var(--border-bright);
+  color:var(--text-dim); font-family:'JetBrains Mono',monospace;
+  font-size:11px; padding:8px 14px; cursor:pointer; z-index:500;
+  letter-spacing:0.1em;
+}
+.tweaks-btn:hover { color:var(--green); border-color:var(--green); }
+.tweaks-title { font-size:11px; letter-spacing:0.15em; text-transform:uppercase; color:var(--green); margin-bottom:14px; border-bottom:1px solid var(--border); padding-bottom:8px; }
+.tweak-row { display:flex; align-items:center; justify-content:space-between; margin-bottom:10px; gap:8px; }
+.tweak-label { font-size:11px; color:var(--text-dim); }
+.tweak-select {
+  background:var(--bg2); border:1px solid var(--border-bright);
+  color:var(--green); font-family:'JetBrains Mono',monospace;
+  font-size:11px; padding:3px 6px; outline:none; cursor:pointer;
+}
+.tweak-select:focus { border-color:var(--green); }
+.toggle-switch {
+  width:32px; height:16px; background:var(--bg); border:1px solid var(--border-bright);
+  border-radius:8px; cursor:pointer; position:relative; transition:background 0.2s;
+}
+.toggle-switch.on { background:var(--green-dim); border-color:var(--green); }
+.toggle-knob {
+  position:absolute; top:2px; left:2px;
+  width:10px; height:10px; background:var(--text-muted); border-radius:50%;
+  transition:transform 0.2s, background 0.2s;
+}
+.toggle-switch.on .toggle-knob { transform:translateX(16px); background:var(--green); box-shadow:0 0 4px var(--green); }
+</style>
 </head>
 <body>
+<div id="root"></div>
 
-    <h1>Digit Recognition</h1>
-    <p class="subtitle">Draw a digit (0-9). Auto-prediction in 1s.</p>
+<script type="text/babel">
+const { useState, useEffect, useRef, useCallback } = React;
 
-    <div class="container">
-        <div class="canvas-container">
-            <canvas id="canvas" width="280" height="280"></canvas>
-            <div class="controls">
-                <button onclick="clearCanvas()">Erase Canvas</button>
+const TWEAK_DEFAULTS = {
+  brushSize: "medium",
+  showPreview28: true,
+  smoothing: true,
+  autoPredict: false,
+};
+
+function Clock() {
+  const [time, setTime] = useState(new Date());
+  useEffect(() => { const t = setInterval(() => setTime(new Date()), 1000); return () => clearInterval(t); }, []);
+  const p = n => String(n).padStart(2,'0');
+  return <span className="clock">{time.toLocaleDateString('fr-FR')} {p(time.getHours())}:{p(time.getMinutes())}:{p(time.getSeconds())}</span>;
+}
+
+function App() {
+  const canvasRef = useRef(null);
+  const previewRef = useRef(null);
+  const logBodyRef = useRef(null);
+  const drawing = useRef(false);
+  const lastPos = useRef(null);
+  const autoPredictTimer = useRef(null);
+
+  const [confs, setConfs] = useState(null);
+  const [prediction, setPrediction] = useState(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const [isEmpty, setIsEmpty] = useState(true);
+  const [log, setLog] = useState([]);
+  const [stats, setStats] = useState({ total: 0, lastPred: '—' });
+  const [tweaksOpen, setTweaksOpen] = useState(false);
+  const [tweaks, setTweaks] = useState(TWEAK_DEFAULTS);
+
+  const addLog = useCallback((msg, type='dim') => {
+    const now = new Date();
+    const p = n => String(n).padStart(2,'0');
+    const ts = `${p(now.getHours())}:${p(now.getMinutes())}:${p(now.getSeconds())}`;
+    setLog(l => [...l.slice(-60), { ts, msg, type }]);
+    setTimeout(() => {
+      if (logBodyRef.current) logBodyRef.current.scrollTop = logBodyRef.current.scrollHeight;
+    }, 50);
+  }, []);
+
+  useEffect(() => {
+    addLog('Système initialisé · MNIST v2.1.0', 'ok');
+    addLog('Modèle chargé · backend: cnn-keras', 'dim');
+    addLog('En attente de saisie…', 'dim');
+  }, []);
+
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    ctx.fillStyle = '#000';
+    ctx.fillRect(0, 0, 280, 280);
+  }, []);
+
+  const brushSizePx = { small: 12, medium: 20, large: 30 }[tweaks.brushSize] || 20;
+
+  const getPos = (e, canvas) => {
+    const rect = canvas.getBoundingClientRect();
+    if (e.touches) {
+      return { x: e.touches[0].clientX - rect.left, y: e.touches[0].clientY - rect.top };
+    }
+    return { x: e.clientX - rect.left, y: e.clientY - rect.top };
+  };
+
+  const updatePreview28 = () => {
+    const canvas = canvasRef.current;
+    const preview = previewRef.current;
+    if (!canvas || !preview) return;
+    const ctx28 = preview.getContext('2d');
+    ctx28.drawImage(canvas, 0, 0, 28, 28);
+  };
+
+  const draw = (e) => {
+    if (!drawing.current) return;
+    e.preventDefault();
+    const canvas = canvasRef.current;
+    const ctx = canvas.getContext('2d');
+    const pos = getPos(e, canvas);
+
+    ctx.strokeStyle = '#fff';
+    ctx.lineWidth = brushSizePx;
+    ctx.lineCap = 'round';
+    ctx.lineJoin = 'round';
+    if (tweaks.smoothing) ctx.imageSmoothingEnabled = true;
+
+    if (lastPos.current) {
+      ctx.beginPath();
+      ctx.moveTo(lastPos.current.x, lastPos.current.y);
+      ctx.lineTo(pos.x, pos.y);
+      ctx.stroke();
+    } else {
+      ctx.beginPath();
+      ctx.arc(pos.x, pos.y, brushSizePx / 2, 0, Math.PI * 2);
+      ctx.fillStyle = '#fff';
+      ctx.fill();
+    }
+    lastPos.current = pos;
+    setIsEmpty(false);
+    updatePreview28();
+  };
+
+  const startDraw = (e) => {
+    clearTimeout(autoPredictTimer.current);
+    drawing.current = true;
+    lastPos.current = null;
+    draw(e);
+  };
+
+  const stopDraw = () => {
+    drawing.current = false;
+    lastPos.current = null;
+    if (tweaks.autoPredict && !isEmpty) {
+      autoPredictTimer.current = setTimeout(predict, 1000);
+    }
+  };
+
+  const clearCanvas = () => {
+    clearTimeout(autoPredictTimer.current);
+    const canvas = canvasRef.current;
+    const ctx = canvas.getContext('2d');
+    ctx.fillStyle = '#000';
+    ctx.fillRect(0, 0, 280, 280);
+    const preview = previewRef.current;
+    if (preview) {
+      const ctx28 = preview.getContext('2d');
+      ctx28.fillStyle = '#000';
+      ctx28.fillRect(0, 0, 28, 28);
+    }
+    setIsEmpty(true);
+    setConfs(null);
+    setPrediction(null);
+    addLog('Canvas effacé', 'dim');
+  };
+
+  const predict = async () => {
+    if (isEmpty) { addLog('[WARN] Aucun chiffre à analyser', 'warn'); return; }
+    setIsLoading(true);
+    addLog('$ ./predict --model=cnn --input=canvas', 'dim');
+
+    try {
+      const canvas = canvasRef.current;
+      const base64 = canvas.toDataURL('image/png');
+
+      const response = await fetch('/predict', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ image: base64 }),
+      });
+
+      const data = await response.json();
+
+      if (data.error) {
+        addLog(`[ERR] ${data.error}`, 'err');
+        setIsLoading(false);
+        return;
+      }
+
+      const { digit, confidences } = data;
+      setConfs(confidences);
+      setPrediction(digit);
+      setStats(s => ({ total: s.total + 1, lastPred: String(digit) }));
+
+      const pct = (confidences[digit] * 100).toFixed(1);
+      addLog(`[OK] Prédiction: ${digit} · confiance: ${pct}%`, 'ok');
+      addLog(`     Scores: [${confidences.map(c => (c*100).toFixed(0)).join(', ')}]`, 'dim');
+    } catch (err) {
+      addLog(`[ERR] ${err.message || 'Erreur inconnue'}`, 'err');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  function setTweak(key, val) {
+    setTweaks(prev => ({ ...prev, [key]: val }));
+  }
+
+  return (
+    <div>
+      {/* Header */}
+      <div className="header">
+        <div className="header-top">
+          <div>
+            <div className="header-title">■ MNIST</div>
+            <div className="header-sub">root@antoinenitter.fr ~ reconnaissance de chiffres manuscrits</div>
+          </div>
+          <Clock />
+        </div>
+        <div className="stats-row">
+          <div className="stat-item">
+            <div className="stat-val">{stats.total}</div>
+            <div className="stat-lbl">Prédictions</div>
+          </div>
+          <div className="stat-item">
+            <div className="stat-val">{stats.lastPred}</div>
+            <div className="stat-lbl">Dernier</div>
+          </div>
+          <div className="stat-item">
+            <div className="stat-val" style={{color:'var(--amber)'}}>CNN</div>
+            <div className="stat-lbl">Backend</div>
+          </div>
+          <div className="stat-item" style={{marginLeft:'auto', alignSelf:'center'}}>
+            <div style={{fontSize:'10px', color:'var(--text-muted)', letterSpacing:'0.08em'}}>
+              <span style={{color:'var(--green)'}}>●</span> modèle actif
             </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Main grid */}
+      <div className="main-grid">
+        {/* Left: draw */}
+        <div className="panel">
+          <div className="panel-header">
+            <span>Saisie</span>
+            <span style={{color:'var(--text-muted)', fontSize:'10px'}}>28×28 px · blanc sur noir</span>
+          </div>
+          <div className="panel-body">
+            <div className="canvas-wrap">
+              <div className="canvas-zone">
+                <canvas
+                  ref={canvasRef}
+                  width={280} height={280}
+                  onMouseDown={startDraw}
+                  onMouseMove={draw}
+                  onMouseUp={stopDraw}
+                  onMouseLeave={stopDraw}
+                  onTouchStart={startDraw}
+                  onTouchMove={draw}
+                  onTouchEnd={stopDraw}
+                />
+              </div>
+              {tweaks.showPreview28 && (
+                <div style={{display:'flex', alignItems:'center', gap:'10px', fontSize:'10px', color:'var(--text-muted)'}}>
+                  <span>Aperçu 28×28</span>
+                  <canvas ref={previewRef} width={28} height={28} className="preview-28" style={{width:56,height:56}} />
+                </div>
+              )}
+              <div className="btn-row">
+                <button className="btn" onClick={clearCanvas}>✗ Effacer</button>
+                <button
+                  className={`btn primary${isLoading ? ' loading' : ''}`}
+                  onClick={predict}
+                  disabled={isLoading || isEmpty}
+                >
+                  {isLoading
+                    ? <><span className="spin">↻</span> Analyse…</>
+                    : <>$ ./predict →</>
+                  }
+                </button>
+              </div>
+            </div>
+          </div>
         </div>
 
-        <div class="result-card" id="result-box">
-            <div id="status" class="status-indicator"></div>
-            <span class="placeholder">?</span>
+        {/* Right: results */}
+        <div className="panel">
+          <div className="panel-header">
+            <span>Résultat</span>
+            {prediction !== null && <span style={{color:'var(--amber)'}}>DIGIT_{prediction}</span>}
+          </div>
+          <div className="panel-body">
+            {prediction === null ? (
+              <div className="idle-state">
+                <div className="idle-big">?</div>
+                <div>Dessinez un chiffre<br/>puis lancez l'analyse</div>
+                <div style={{color:'var(--border-bright)', fontSize:'10px', marginTop:'4px'}}>0 → 9</div>
+              </div>
+            ) : (
+              <div className="pred-display">
+                <div className="pred-label">Chiffre détecté</div>
+                <div className="pred-digit">{prediction}</div>
+                <div className="pred-conf">{confs ? (confs[prediction]*100).toFixed(1) : '—'}%</div>
+              </div>
+            )}
+
+            {/* Confidence bars */}
+            <div className="conf-list" style={{marginTop: prediction !== null ? '12px' : 0}}>
+              {(confs || Array(10).fill(0)).map((c, i) => {
+                const isWinner = prediction === i;
+                return (
+                  <div key={i} className="conf-row">
+                    <div className={`conf-digit${isWinner ? ' winner' : ''}`}>{i}</div>
+                    <div className="conf-bar-bg">
+                      <div
+                        className={`conf-bar-fill${isWinner ? ' winner' : ''}`}
+                        style={{ width: `${(c * 100).toFixed(1)}%` }}
+                      />
+                    </div>
+                    <div className={`conf-pct${isWinner ? ' winner' : ''}`}>
+                      {(c * 100).toFixed(1)}%
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
         </div>
+      </div>
+
+      {/* Log */}
+      <div className="log-panel">
+        <div className="log-header">
+          <span style={{color:'var(--green)'}}>Terminal</span>
+          <span>{log.length} entrées</span>
+        </div>
+        <div className="log-body" ref={logBodyRef}>
+          {log.map((entry, i) => (
+            <div key={i} className="log-entry">
+              <span className="log-time">[{entry.ts}]</span>
+              <span className={`log-${entry.type}`}>{entry.msg}</span>
+            </div>
+          ))}
+          <div><span style={{color:'var(--text-muted)'}}>$ </span><span className="cursor"/></div>
+        </div>
+      </div>
+
+      {/* Tweaks toggle button */}
+      {!tweaksOpen && (
+        <button className="tweaks-btn" onClick={() => setTweaksOpen(true)}>⚙ tweaks</button>
+      )}
+
+      {/* Tweaks panel */}
+      {tweaksOpen && (
+        <div className="tweaks-panel">
+          <div className="tweaks-title" style={{display:'flex', justifyContent:'space-between', alignItems:'center'}}>
+            <span>⚙ Tweaks</span>
+            <span style={{cursor:'pointer', fontSize:'14px', color:'var(--text-muted)'}} onClick={() => setTweaksOpen(false)}>✕</span>
+          </div>
+          <div className="tweak-row">
+            <span className="tweak-label">Taille pinceau</span>
+            <select className="tweak-select" value={tweaks.brushSize} onChange={e => setTweak('brushSize', e.target.value)}>
+              <option value="small">Fin (12px)</option>
+              <option value="medium">Moyen (20px)</option>
+              <option value="large">Épais (30px)</option>
+            </select>
+          </div>
+          <div className="tweak-row">
+            <span className="tweak-label">Aperçu 28×28</span>
+            <div className={`toggle-switch${tweaks.showPreview28 ? ' on' : ''}`} onClick={() => setTweak('showPreview28', !tweaks.showPreview28)}>
+              <div className="toggle-knob"/>
+            </div>
+          </div>
+          <div className="tweak-row">
+            <span className="tweak-label">Lissage</span>
+            <div className={`toggle-switch${tweaks.smoothing ? ' on' : ''}`} onClick={() => setTweak('smoothing', !tweaks.smoothing)}>
+              <div className="toggle-knob"/>
+            </div>
+          </div>
+          <div className="tweak-row">
+            <span className="tweak-label">Auto-predict</span>
+            <div className={`toggle-switch${tweaks.autoPredict ? ' on' : ''}`} onClick={() => setTweak('autoPredict', !tweaks.autoPredict)}>
+              <div className="toggle-knob"/>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
+  );
+}
 
-    <script>
-        const canvas = document.getElementById('canvas');
-        const ctx = canvas.getContext('2d');
-        const resultBox = document.getElementById('result-box');
-        const statusDot = document.getElementById('status');
-        
-        let isDrawing = false;
-        let predictTimer = null; // Stores the timeout ID
-
-        // Drawing Style Configuration
-        ctx.strokeStyle = "white";
-        ctx.lineWidth = 15;
-        ctx.lineCap = "round";
-        ctx.lineJoin = "round";
-
-        // --- EVENT HANDLERS (MOUSE & TOUCH) ---
-        
-        function startDrawing(e) {
-            isDrawing = true;
-            clearTimeout(predictTimer); // User is drawing, cancel pending prediction
-            statusDot.className = "status-indicator"; // Reset status
-            draw(e);
-        }
-
-        function stopDrawing() {
-            if (isDrawing) {
-                isDrawing = false;
-                ctx.beginPath();
-                // Start debounce timer: predict after 1s of inactivity
-                predictTimer = setTimeout(predictDigit, 1000);
-            }
-        }
-
-        function draw(e) {
-            if (!isDrawing) return;
-            e.preventDefault(); // Prevent scrolling on touch devices
-            
-            const rect = canvas.getBoundingClientRect();
-            // Handle both Mouse and Touch events
-            const clientX = e.clientX || e.touches[0].clientX;
-            const clientY = e.clientY || e.touches[0].clientY;
-            
-            const x = clientX - rect.left;
-            const y = clientY - rect.top;
-
-            ctx.lineTo(x, y);
-            ctx.stroke();
-            ctx.beginPath();
-            ctx.moveTo(x, y);
-        }
-
-        // Mouse Events
-        canvas.addEventListener('mousedown', startDrawing);
-        canvas.addEventListener('mousemove', draw);
-        canvas.addEventListener('mouseup', stopDrawing);
-        canvas.addEventListener('mouseout', stopDrawing);
-
-        // Touch Events (Mobile/Tablet)
-        canvas.addEventListener('touchstart', startDrawing);
-        canvas.addEventListener('touchmove', draw);
-        canvas.addEventListener('touchend', stopDrawing);
-
-        // --- LOGIC FUNCTIONS ---
-
-        function clearCanvas() {
-            clearTimeout(predictTimer); // Cancel any pending prediction
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            ctx.beginPath();
-            resultBox.innerHTML = '<div id="status" class="status-indicator"></div><span class="placeholder">?</span>';
-            // Re-select statusDot because DOM was overwritten
-            document.getElementById('status').className = "status-indicator";
-        }
-
-        async function predictDigit() {
-            // UI Feedback: "Thinking" state (Orange Dot)
-            const dot = document.getElementById('status');
-            if(dot) dot.className = "status-indicator status-thinking";
-
-            const imageData = canvas.toDataURL('image/png');
-
-            try {
-                const response = await fetch('/predict', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ image: imageData })
-                });
-
-                const data = await response.json();
-
-                if (data.digit !== undefined) {
-                    resultBox.innerHTML = `
-                        <div id="status" class="status-indicator status-success"></div>
-                        <p class="digit">${data.digit}</p>
-                        <p class="conf">Confidence: ${data.confidence}</p>
-                    `;
-                }
-            } catch (error) {
-                console.error(error);
-                alert("Error: Is the Python server running?");
-            }
-        }
-    </script>
+ReactDOM.createRoot(document.getElementById('root')).render(<App/>);
+</script>
 </body>
 </html>
