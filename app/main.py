@@ -3,7 +3,7 @@ import base64
 import numpy as np
 import cv2
 import tensorflow as tf
-from flask import Flask, request, jsonify, render_template
+from flask import Flask, request, jsonify, send_file
 from flask_cors import CORS
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -23,28 +23,26 @@ except Exception as e:
     model = None
 
 def preprocess_image(base64_string):
-    """Image processing pipeline: Base64 -> Numpy -> Grayscale -> 28x28 -> Normalize"""
     if "," in base64_string:
         base64_string = base64_string.split(",")[1]
-    
+
     img_bytes = base64.b64decode(base64_string)
     img_arr = np.frombuffer(img_bytes, dtype=np.uint8)
-    
-    img = cv2.imdecode(img_arr, 1) 
-    
+
+    img = cv2.imdecode(img_arr, 1)
     gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
     resized = cv2.resize(gray, (28, 28), interpolation=cv2.INTER_AREA)
-    
+
     processed = resized.astype('float32') / 255.0
     processed = np.expand_dims(processed, axis=0)
     processed = np.expand_dims(processed, axis=-1)
-    
+
     return processed
 
 
 @app.route('/')
 def index():
-    return render_template('index.html')
+    return send_file(os.path.join(TEMPLATE_DIR, 'index.html'))
 
 @app.route('/predict', methods=['POST'])
 def predict():
@@ -57,14 +55,14 @@ def predict():
             return jsonify({'error': 'No image received'}), 400
 
         input_tensor = preprocess_image(data['image'])
-  
-        prediction = model.predict(input_tensor, verbose=0)
-        predicted_class = int(np.argmax(prediction))
-        confidence = float(np.max(prediction))
+
+        raw = model.predict(input_tensor, verbose=0)[0]
+        predicted_class = int(np.argmax(raw))
+        confidences = [float(x) for x in raw]
 
         return jsonify({
             'digit': predicted_class,
-            'confidence': f"{confidence * 100:.1f}%"
+            'confidences': confidences,
         })
 
     except Exception as e:
