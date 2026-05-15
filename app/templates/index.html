@@ -11,26 +11,28 @@
 <script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
 <style>
 :root {
-  --green-hi:       #86efac;
-  --green:          #4ade80;
-  --green-mid:      #22c55e;
-  --green-dim:      #16a34a;
-  --green-deep:     #0f3d25;
-  --green-glow:     rgba(74,222,128,0.12);
-  --green-glow-soft:rgba(74,222,128,0.05);
-  --amber: #fbbf24;
-  --red:   #f87171;
-  --bg:    #0d1117;
-  --bg2:   #161b22;
-  --bg3:   #1c2128;
-  --bg4:   #22272e;
-  --border:        #21262d;
-  --border-mid:    rgba(74,222,128,0.15);
-  --border-bright: rgba(74,222,128,0.30);
-  --text:       #e2e8f0;
-  --text-dim:   #94a3b8;
-  --text-muted: #64748b;
-  --text-faint: #374151;
+  --bg:           #0d1117;
+  --bg2:          #161b22;
+  --bg3:          #1c2128;
+  --bg4:          #22272e;
+  --orange:       #e07830;
+  --green:        #4ade80;
+  --green-hi:     #86efac;
+  --green-mid:    #22c55e;
+  --green-dim:    #2d6a4f;
+  --green-deep:   #0f3d25;
+  --green-muted:  rgba(74,222,128,.15);
+  --green-glow-soft: rgba(74,222,128,0.05);
+  --blue:         #60a5fa;
+  --purple:       #a78bfa;
+  --red:          #f87171;
+  --text:         #e2e8f0;
+  --text-dim:     #94a3b8;
+  --text-muted:   #64748b;
+  --text-faint:   #374151;
+  --border:       #21262d;
+  --border-mid:   rgba(74,222,128,0.15);
+  --border-bright: rgba(74,222,128,.35);
 }
 * { margin:0; padding:0; box-sizing:border-box; }
 body {
@@ -132,7 +134,7 @@ canvas { display:block; }
 .pred-display { display:flex; flex-direction:column; align-items:center; justify-content:center; gap:8px; padding:16px 0; }
 .pred-digit { font-size:96px; font-weight:700; line-height:1; color:var(--green-hi); }
 .pred-label { font-size:10px; letter-spacing:0.15em; text-transform:uppercase; color:var(--text-faint); }
-.pred-conf { font-size:22px; font-weight:700; color:var(--amber); }
+.pred-conf { font-size:22px; font-weight:700; color:var(--orange); }
 
 /* ── Idle ── */
 .idle-state {
@@ -153,7 +155,7 @@ canvas { display:block; }
 .log-entry { font-size:11px; line-height:1.5; animation:fadeIn 0.2s ease; }
 .log-time { color:var(--text-faint); margin-right:8px; }
 .log-ok   { color:var(--green-mid); }
-.log-warn { color:var(--amber); }
+.log-warn { color:var(--orange); }
 .log-err  { color:var(--red); }
 .log-dim  { color:var(--text-muted); }
 
@@ -454,7 +456,7 @@ function App() {
             <div className="stat-lbl">{t.statLast}</div>
           </div>
           <div className="stat-item">
-            <div className="stat-val" style={{color:'var(--amber)'}}>CNN</div>
+            <div className="stat-val" style={{color:'var(--orange)'}}>CNN</div>
             <div className="stat-lbl">{t.statBackend}</div>
           </div>
           <div className="stat-item" style={{marginLeft:'auto', alignSelf:'center'}}>
@@ -515,7 +517,7 @@ function App() {
         <div className="panel">
           <div className="panel-header">
             <span>{t.panelResult}</span>
-            {prediction !== null && <span style={{color:'var(--amber)'}}>DIGIT_{prediction}</span>}
+            {prediction !== null && <span style={{color:'var(--orange)'}}>DIGIT_{prediction}</span>}
           </div>
           <div className="panel-body">
             {prediction === null ? (
