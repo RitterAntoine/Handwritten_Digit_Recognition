@@ -1,0 +1,6 @@
+.git
+.gitignore
+README.md
+assets/
+training/
+**/__pycache__/
